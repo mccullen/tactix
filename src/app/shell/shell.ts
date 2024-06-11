@@ -5,29 +5,32 @@ export class Shell {
     router: Router;
 
     configureRouter(config: RouterConfiguration, router: Router) {
-        config.title = 'McCullen';
+        //config.title = 'TacTix';
         config.map([{
-            route: ['', 'home'],
-            name: 'home',
+            route: ['', 'tic-tac-toe'],
+            name: 'tic-tac-toe',
             settings: { icon: 'home' },
-            moduleId: PLATFORM.moduleName('../home/home'),
+            moduleId: PLATFORM.moduleName('../tic-tac-toe/tic-tac-toe'),
             nav: true,
-            title: 'Home'
+            title: 'Tic-Tac-Toe'
         }, {
-            route: 'counter',
-            name: 'counter',
+            route: 'about',
+            name: 'about',
             settings: { icon: 'education' },
-            moduleId: PLATFORM.moduleName('../counter/counter'),
+            moduleId: PLATFORM.moduleName('../about/about'),
             nav: true,
-            title: 'Counter'
-        }, {
-            route: 'projects',
-            name: 'projects',
+            title: 'About'
+        }
+        , {
+            route: 'contact',
+            name: 'contact',
             settings: { icon: 'knight' },
-            moduleId: PLATFORM.moduleName('../projects/tic-tac-toe'),
+            moduleId: PLATFORM.moduleName('../contact/contact'),
             nav: true,
-            title: 'Projects'
-        }]);
+            title: 'Contact'
+        }
+
+       ]);
 
         this.router = router;
     }

@@ -73,7 +73,7 @@ export class TicTacToe {
         // Get settings from the user
         let promise = new Promise<boolean>((resolve, reject) => {
             //this.dialogService.open({ viewModel: GameSettings })
-            this.dialogService.open({ viewModel: PLATFORM.moduleName('app/projects/game-settings') })
+            this.dialogService.open({ viewModel: PLATFORM.moduleName('app/tic-tac-toe/game-settings') })
                 .whenClosed(response => {
                     if (!response.wasCancelled) {
                         this.nRows = response.output.nRows;
