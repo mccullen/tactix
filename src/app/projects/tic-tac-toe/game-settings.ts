@@ -18,8 +18,8 @@ export class GameSettings {
 
     public nRows: number = this.maxRows;
     public nColumns: number = this.maxColumns;
-    public showState: boolean = false;
-    public showDepth: boolean = false;
+    public showState: boolean = true;
+    public showDepth: boolean = true;
     humanFirst: boolean = undefined;
     public playOptions: KeyValue<PlayOption, string>[] = [
         { key: PlayOption.HumanVsHuman, value: "Human versus Human" },

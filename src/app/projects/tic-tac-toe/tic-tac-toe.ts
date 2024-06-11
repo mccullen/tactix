@@ -1,6 +1,6 @@
 ﻿import { boardFactory } from "./boardFactory";
-//import { computerPlayerFactory } from "./computerPlayerFactory";
-import { ComputerPlayerService } from "./ComputerPlayerService";
+import { computerPlayerFactory } from "./computerPlayerFactory";
+//import { ComputerPlayerService } from "./ComputerPlayerService";
 import { inject, autoinject, bindable } from "aurelia-framework";
 import { DialogService } from "aurelia-dialog";
 import { GameSettings, PlayOption } from "./game-settings";
@@ -31,14 +31,28 @@ export class TicTacToe {
     // Would it be better to inject a board object instead of the factory?
     constructor(
             public dialogService: DialogService,
-            public router: Router,
-            public computerPlayerService: ComputerPlayerService) {
+            public router: Router/*,
+            public computerPlayerService: ComputerPlayerService*/) {
         this.dialogService = dialogService;
         this.router = router;
-        this.computerPlayerService = computerPlayerService;
+        //this.computerPlayerService = computerPlayerService;
     }
-    attached() {
-
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async attached() {
+        this.updateSquareDisplay();
+        if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && !this.humanFirst) {
+            await this.makeComputerPlayerMove();
+        }
+        if (this.selectedPlayOption.key === PlayOption.ComputerVsComputer) {
+            $("." + this.squareClass).prop({ disabled: true });
+            while (this.board.getState() === this.board.state.unfinished) {
+                await this.sleep(1000);
+                await this.makeComputerPlayerMove();
+            }
+        }
+        /*
         this.updateSquareDisplay().then(() => {
             if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && !this.humanFirst) {
                 this.makeComputerPlayerMove();
@@ -46,10 +60,12 @@ export class TicTacToe {
             if (this.selectedPlayOption.key === PlayOption.ComputerVsComputer) {
                 $("." + this.squareClass).prop({ disabled: true });
                 while (this.board.getState() === this.board.state.unfinished) {
+                    debugger;
                     this.makeComputerPlayerMove();
                 }
             }
         });
+        */
     }
     getGameSettings() {
 
@@ -69,7 +85,7 @@ export class TicTacToe {
                         this.humanFirst = response.output.humanFirst;
                         this.board = boardFactory({ numRows: this.nRows, numColumns: this.nColumns });
                         this.currentPlayer = this.board.getCurrentPlayer();
-                        //this.computerPlayer = computerPlayerFactory();
+                        this.computerPlayer = computerPlayerFactory();
                         this.pieces = this.board.getPieces();
                         resolve(true);
                     } else {
@@ -82,7 +98,7 @@ export class TicTacToe {
     private readonly winClass: string = "win";
     private readonly loseClass: string = "lose";
     private readonly tieClass: string = "tie";
-    playPiece(row: number, column: number) {
+    async playPiece(row: number, column: number) {
         // Disable square of the move just played
         let square = document.getElementById(this.getSquareId(row, column)) as HTMLButtonElement;
         square.disabled = true;
@@ -90,27 +106,33 @@ export class TicTacToe {
         // Place piece
         square.innerHTML = this.board.getCurrentPlayer();
         $(square).fadeOut(1);
-        $(square).fadeIn(1000);
+        $(square).fadeIn(10);
         //$(square).animate({ backgroundColor: "white" }, 10000);
         this.board.playPiece({ row: row, column: column });
         this.currentPlayer = this.board.getCurrentPlayer();
 
+        // Remove state color indication classes and depth numbers and update the non-empty squares
+        $(square).removeClass(this.stateClasses);
+        let displ = this.updateSquareDisplay();
+
         let state = this.board.getState();
         if (state !== this.board.state.unfinished) {
+            // Someone one the game! 
             $("." + this.squareClass).prop({ disabled: true });
+            await this.sleep(100);
             if (state === this.board.state.xWon) {
-                setTimeout(() => { alert("x won"); }, 1);
+                alert("x won");
             } else if (state === this.board.state.oWon) {
-                setTimeout(() => { alert("o won"); }, 1);
+                //setTimeout(() => { alert("o won"); }, 1);
+                alert("o won");
             } else if (state === this.board.state.draw) {
-                setTimeout(() => { alert("tie"); }, 1);
+                //setTimeout(() => { alert("tie"); }, 1);
+                alert("tie");
             }
         }
 
 
-        // Remove state color indication classes and depth numbers and update the non-empty squares
-        $(square).removeClass(this.stateClasses);
-        return this.updateSquareDisplay();
+        return displ;
     }
     onReset() {
         //this.router.navigateToRoute("tic-tac-toe");
@@ -141,9 +163,17 @@ export class TicTacToe {
         $("." + this.squareClass).removeClass(this.stateClasses);
 
         // Get the depth and state information of all empty squares
-        return this.computerPlayerService.getMoveValues(this.board)
-            .then((result: any[]) => {
-                let moveValues = result;
+        //return this.computerPlayerService.getMoveValues(this.board)
+            //.then((result: any[]) => {
+                //let moveValues = result;
+
+//////////////
+let promise = new Promise((resolve, reject) => {
+            let moveValues = this.computerPlayer.getMoveValues(this.board);
+//////
+
+
+
                 // Update the display of each non-empty square
                 for (let iMove = 0; iMove < moveValues.length; ++iMove) {
                     let square = this.getSquare(moveValues[iMove].row, moveValues[iMove].column);
@@ -168,23 +198,44 @@ export class TicTacToe {
                 }
             });
 
+
+
     }
     private getUnplayedSquares() {
+        /*
         let unplayedSquares = $("." + this.squareClass + "." + this.tieClass)
             .add("." + this.squareClass + "." + this.winClass)
             .add("." + this.squareClass + "." + this.loseClass);
+            */
+        let unplayedSquares = $(".square:empty");
         return unplayedSquares;
     }
-    makeComputerPlayerMove() {
+    async makeComputerPlayerMove() {
         $("." + this.squareClass).prop({ disabled: true });
-        setTimeout(() => {
+        await this.sleep(1000);
+        //setTimeout(() => {
+            /*
             let bestMove = this.computerPlayerService.getBestMove(this.board);
             this.playPiece(bestMove.row, bestMove.column).then(() => {
                 this.getUnplayedSquares().prop({ disabled: false });
             });
-        }, 1000);
+            */
+            let bestMove = this.computerPlayer.getBestMove(this.board);
+            this.playPiece(bestMove.row, bestMove.column);
+        //}, 1000);
+        let state = this.board.getState();
+        if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && state === this.board.state.unfinished) {
+            this.getUnplayedSquares().prop({ disabled: false });
+        }
     }
-    public onSquareClick(row: number, column: number) {
+    public async onSquareClick(row: number, column: number) {
+        this.playPiece(row, column);
+        let state = this.board.getState();
+        if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && state === this.board.state.unfinished) {
+            // It is computer player's turn. Make his or her move.
+            await this.makeComputerPlayerMove();
+        }
+        /*
         this.playPiece(row, column).then(() => {
             let state = this.board.getState();
             if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && state === this.board.state.unfinished) {
@@ -192,6 +243,7 @@ export class TicTacToe {
                 this.makeComputerPlayerMove();
             }
         });
+        */
 
     }
     private getSquareId(row: number, column: number) {
