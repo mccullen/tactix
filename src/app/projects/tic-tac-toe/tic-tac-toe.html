@@ -1,0 +1,18 @@
+﻿<template>
+    <require from="./tic-tac-toe.css"></require>
+    <h1>Tic-Tac-Toe!</h1>
+    ${currentPlayer}'s turn
+    <table id="tic-tac-toe">
+        <tr repeat.for="row of pieces">
+            <td repeat.for="piece of row">
+                <button class="btn square" id="sq-${$parent.$index}-${$index}" 
+                        click.delegate="onSquareClick($parent.$index, $index)">
+                </button>
+            </td>
+        </tr>
+    </table>
+
+    <div class="checkbox"><label><input type="checkbox" checked.bind="showState" > Show state?</label></div>
+    <div class="checkbox"><label><input type="checkbox" checked.bind="showDepth" > Show depth?</label></div>
+    <button class="btn btn-danger" click.delegate="onReset()">Reset</button>
+</template>

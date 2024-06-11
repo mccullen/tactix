@@ -1,0 +1,63 @@
+﻿<template>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <button click.delegate="controller.close()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title">Game Settings</h3>
+            </div>
+            <!-- Body -->
+            <div class="modal-body">
+                <form>
+                    <!-- Number of Rows -->
+                    <div class="form-group">
+                        <label>Number of Rows</label>
+                        <input type="number" value.bind="nRows" class="form-control" min="${ minRows }" max.bind="maxRows">
+                    </div>
+
+                    <!-- Number of Columns -->
+                    <div class="form-group">
+                        <label>Number of Columns</label>
+                        <input type="number" value.bind="nColumns" class="form-control" min="${ minColumns }" max="${ maxColumns }">
+                    </div>
+
+                    <!-- Show State -->
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" checked.bind="showState">Show state?
+                        </label>
+                    </div>
+                    <!-- Show depth -->
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" checked.bind="showDepth">Show depth?
+                        </label>
+                    </div>
+
+                    <!-- Play Option -->
+                    <label>Select an option:</label>
+                    <div class="radio" repeat.for="option of playOptions">
+                        <label>
+                            <input type="radio" name="play-options-group" model.bind="option" checked.two-way="$parent.selectedPlayOption">
+                            ${ option.value }
+                        </label>
+                    </div>
+                    <!-- Play Order (only displayed for human versus computer option) -->
+                    <div class="checkbox" if.bind="selectedPlayOption.key === 1">
+                        <label>
+                            <input type="checkbox" checked.bind="humanFirst">Go first?
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button disabled.bind="selectedPlayOption === undefined" click.delegate="controller.ok(getSettings())" type="button" class="btn btn-primary">Ok</button>
+                <button click.delegate="controller.close()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</template>

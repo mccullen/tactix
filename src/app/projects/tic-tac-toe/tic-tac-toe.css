@@ -1,0 +1,23 @@
+﻿/* Styles for the squares */
+.square {
+    color: black;
+    width: 65px;
+    height: 65px;
+    border-radius: 0;
+}
+
+.win {
+    background-color: rgba(75, 200, 56, 0.5);
+}
+
+.lose {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.tie {
+    background-color: rgba(255, 216, 0, 0.5);
+}
+
+#tic-tac-toe td {
+    border: 5px solid black;
+}
