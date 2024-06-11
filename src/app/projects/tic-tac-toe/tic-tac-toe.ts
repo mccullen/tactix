@@ -45,32 +45,20 @@ export class TicTacToe {
         if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && !this.humanFirst) {
             await this.makeComputerPlayerMove();
         }
+        // cpu vs cpu
         if (this.selectedPlayOption.key === PlayOption.ComputerVsComputer) {
+            // disable all squares
             $("." + this.squareClass).prop({ disabled: true });
             while (this.board.getState() === this.board.state.unfinished) {
                 await this.sleep(1000);
                 await this.makeComputerPlayerMove();
             }
         }
-        /*
-        this.updateSquareDisplay().then(() => {
-            if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && !this.humanFirst) {
-                this.makeComputerPlayerMove();
-            }
-            if (this.selectedPlayOption.key === PlayOption.ComputerVsComputer) {
-                $("." + this.squareClass).prop({ disabled: true });
-                while (this.board.getState() === this.board.state.unfinished) {
-                    debugger;
-                    this.makeComputerPlayerMove();
-                }
-            }
-        });
-        */
     }
     getGameSettings() {
 
     }
-    public canActivate() {
+    public activate() {
         // Get settings from the user
         let promise = new Promise<boolean>((resolve, reject) => {
             //this.dialogService.open({ viewModel: GameSettings })
@@ -103,6 +91,7 @@ export class TicTacToe {
         let square = document.getElementById(this.getSquareId(row, column)) as HTMLButtonElement;
         square.disabled = true;
 
+
         // Place piece
         square.innerHTML = this.board.getCurrentPlayer();
         $(square).fadeOut(1);
@@ -110,6 +99,10 @@ export class TicTacToe {
         //$(square).animate({ backgroundColor: "white" }, 10000);
         this.board.playPiece({ row: row, column: column });
         this.currentPlayer = this.board.getCurrentPlayer();
+
+        // Give square just played new class for being played
+        square.classList.add("played");
+        square.classList.add(`${this.currentPlayer}-played`);
 
         // Remove state color indication classes and depth numbers and update the non-empty squares
         $(square).removeClass(this.stateClasses);
@@ -138,7 +131,7 @@ export class TicTacToe {
         //this.router.navigateToRoute("tic-tac-toe");
         //this.router.navigateToRoute("projects/tic-tac-toe");
         // Reactivate page and update the squares with selected options
-        this.canActivate().then((response) => {
+        this.activate().then((response) => {
             //this.updateSquareDisplay();
             //debugger;
             if (response) {
@@ -147,6 +140,9 @@ export class TicTacToe {
                 squares.prop({ disabled: false });
                 this.attached();
             }
+        }).catch(function () {
+            // without catching rejection (They clicked "Close"), an error will get thrown
+            // So, just swallow it....
         });
     }
     private get stateClasses() {
@@ -168,7 +164,7 @@ export class TicTacToe {
                 //let moveValues = result;
 
 //////////////
-let promise = new Promise((resolve, reject) => {
+//let promise = new Promise((resolve, reject) => {
             let moveValues = this.computerPlayer.getMoveValues(this.board);
 //////
 
@@ -196,33 +192,27 @@ let promise = new Promise((resolve, reject) => {
                         }
                     }
                 }
-            });
+            //});
 
 
 
     }
     private getUnplayedSquares() {
-        /*
-        let unplayedSquares = $("." + this.squareClass + "." + this.tieClass)
-            .add("." + this.squareClass + "." + this.winClass)
-            .add("." + this.squareClass + "." + this.loseClass);
-            */
-        let unplayedSquares = $(".square:empty");
+        let unplayedSquares = $(".square:not(.played)");
         return unplayedSquares;
     }
     async makeComputerPlayerMove() {
+        // disable btns so cpu player can make move
         $("." + this.squareClass).prop({ disabled: true });
-        await this.sleep(1000);
-        //setTimeout(() => {
-            /*
-            let bestMove = this.computerPlayerService.getBestMove(this.board);
-            this.playPiece(bestMove.row, bestMove.column).then(() => {
-                this.getUnplayedSquares().prop({ disabled: false });
-            });
-            */
-            let bestMove = this.computerPlayer.getBestMove(this.board);
-            this.playPiece(bestMove.row, bestMove.column);
-        //}, 1000);
+
+        await this.sleep(1000);// think...
+
+        // Make move
+        let bestMove = this.computerPlayer.getBestMove(this.board);
+        this.playPiece(bestMove.row, bestMove.column);
+
+        // Re-enable buttons if playing human
+        debugger;
         let state = this.board.getState();
         if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && state === this.board.state.unfinished) {
             this.getUnplayedSquares().prop({ disabled: false });
@@ -235,17 +225,8 @@ let promise = new Promise((resolve, reject) => {
             // It is computer player's turn. Make his or her move.
             await this.makeComputerPlayerMove();
         }
-        /*
-        this.playPiece(row, column).then(() => {
-            let state = this.board.getState();
-            if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && state === this.board.state.unfinished) {
-                // It is computer player's turn. Make his or her move.
-                this.makeComputerPlayerMove();
-            }
-        });
-        */
-
     }
+
     private getSquareId(row: number, column: number) {
         return "sq" + "-" + row + "-" + column;
     }

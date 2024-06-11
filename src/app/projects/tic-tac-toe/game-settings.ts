@@ -26,7 +26,7 @@ export class GameSettings {
         { key: PlayOption.HumanVsComputer, value: "Human versus Computer" },
         { key: PlayOption.ComputerVsComputer, value: "Computer versus Computer" }
     ];
-    public selectedPlayOption: KeyValue<PlayOption, string>;
+    public selectedPlayOption: KeyValue<PlayOption, string> = this.playOptions[0];
 
     constructor(public controller: DialogController) {
         this.controller = controller;

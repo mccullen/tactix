@@ -21,3 +21,7 @@
 #tic-tac-toe td {
     border: 5px solid black;
 }
+
+.square {
+    font-size: xx-large;
+}
