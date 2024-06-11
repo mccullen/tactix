@@ -6,6 +6,7 @@ import { DialogService } from "aurelia-dialog";
 import { GameSettings, PlayOption } from "./game-settings";
 import { Router } from "aurelia-router";
 import { KeyValue } from "../../resources/KeyValue";
+import {PLATFORM} from 'aurelia-pal';
 //import $ from 'bootstrap';
 import * as $ from "jquery";
 
@@ -56,7 +57,8 @@ export class TicTacToe {
     public canActivate() {
         // Get settings from the user
         let promise = new Promise<boolean>((resolve, reject) => {
-            this.dialogService.open({ viewModel: GameSettings })
+            //this.dialogService.open({ viewModel: GameSettings })
+            this.dialogService.open({ viewModel: PLATFORM.moduleName('app/projects/tic-tac-toe/game-settings') })
                 .whenClosed(response => {
                     if (!response.wasCancelled) {
                         this.nRows = response.output.nRows;
