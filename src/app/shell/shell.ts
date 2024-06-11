@@ -24,7 +24,7 @@ export class Shell {
             route: 'projects',
             name: 'projects',
             settings: { icon: 'knight' },
-            moduleId: PLATFORM.moduleName('../projects/shell'),
+            moduleId: PLATFORM.moduleName('../projects/tic-tac-toe'),
             nav: true,
             title: 'Projects'
         }]);

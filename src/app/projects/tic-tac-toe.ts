@@ -5,7 +5,7 @@ import { inject, autoinject, bindable } from "aurelia-framework";
 import { DialogService } from "aurelia-dialog";
 import { GameSettings, PlayOption } from "./game-settings";
 import { Router } from "aurelia-router";
-import { KeyValue } from "../../resources/KeyValue";
+import { KeyValue } from "../resources/KeyValue";
 import {PLATFORM} from 'aurelia-pal';
 //import $ from 'bootstrap';
 import * as $ from "jquery";
@@ -16,15 +16,16 @@ export class TicTacToe {
     private computerPlayer: any;
 
 
-    public nRows: number;
-    public nColumns: number;
+    defaultGameSettings = new GameSettings(null);
+    public nRows: number = this.defaultGameSettings.nRows;
+    public nColumns: number = this.defaultGameSettings.nColumns;
     @bindable
-    public showState: boolean;
+    public showState: boolean = this.defaultGameSettings.showState;
     @bindable
-    public showDepth: boolean;
-    public gameSettings: any;
-    public selectedPlayOption: KeyValue<PlayOption, string>;
-    humanFirst: boolean;
+    public showDepth: boolean = this.defaultGameSettings.showDepth;
+    //public gameSettings: any;
+    public selectedPlayOption: KeyValue<PlayOption, string> = this.defaultGameSettings.selectedPlayOption;
+    humanFirst: boolean = this.defaultGameSettings.humanFirst;
     currentPlayer: string;
     pieces: number[][];
 
@@ -35,12 +36,16 @@ export class TicTacToe {
             public computerPlayerService: ComputerPlayerService*/) {
         this.dialogService = dialogService;
         this.router = router;
-        //this.computerPlayerService = computerPlayerService;
+        this.setNonGameSettingsProps();
     }
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+    async canActivate() {
+    }
+
     async attached() {
+        //let result = await this.loadGameSettings();
         this.updateSquareDisplay();
         if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && !this.humanFirst) {
             await this.makeComputerPlayerMove();
@@ -56,13 +61,19 @@ export class TicTacToe {
         }
     }
     getGameSettings() {
-
     }
-    public activate() {
+
+    public setNonGameSettingsProps() {
+        this.board = boardFactory({ numRows: this.nRows, numColumns: this.nColumns });
+        this.currentPlayer = this.board.getCurrentPlayer();
+        this.computerPlayer = computerPlayerFactory();
+        this.pieces = this.board.getPieces();
+    }
+    public async loadGameSettings() {
         // Get settings from the user
         let promise = new Promise<boolean>((resolve, reject) => {
             //this.dialogService.open({ viewModel: GameSettings })
-            this.dialogService.open({ viewModel: PLATFORM.moduleName('app/projects/tic-tac-toe/game-settings') })
+            this.dialogService.open({ viewModel: PLATFORM.moduleName('app/projects/game-settings') })
                 .whenClosed(response => {
                     if (!response.wasCancelled) {
                         this.nRows = response.output.nRows;
@@ -71,10 +82,7 @@ export class TicTacToe {
                         this.showDepth = response.output.showDepth;
                         this.selectedPlayOption = response.output.selectedPlayOption;
                         this.humanFirst = response.output.humanFirst;
-                        this.board = boardFactory({ numRows: this.nRows, numColumns: this.nColumns });
-                        this.currentPlayer = this.board.getCurrentPlayer();
-                        this.computerPlayer = computerPlayerFactory();
-                        this.pieces = this.board.getPieces();
+                        this.setNonGameSettingsProps();
                         resolve(true);
                     } else {
                         reject(false);
@@ -86,6 +94,10 @@ export class TicTacToe {
     private readonly winClass: string = "win";
     private readonly loseClass: string = "lose";
     private readonly tieClass: string = "tie";
+    private readonly playedClass: string = "played";
+    private readonly xPlayedClass: string = "x-played";
+    private readonly oPlayedClass: string = "o-played";
+
     async playPiece(row: number, column: number) {
         // Disable square of the move just played
         let square = document.getElementById(this.getSquareId(row, column)) as HTMLButtonElement;
@@ -101,8 +113,8 @@ export class TicTacToe {
         this.currentPlayer = this.board.getCurrentPlayer();
 
         // Give square just played new class for being played
-        square.classList.add("played");
-        square.classList.add(`${this.currentPlayer}-played`);
+        square.classList.add(this.playedClass);
+        square.classList.add(this.currentPlayer === this.board.piece.x ? this.xPlayedClass : this.oPlayedClass);
 
         // Remove state color indication classes and depth numbers and update the non-empty squares
         $(square).removeClass(this.stateClasses);
@@ -131,19 +143,23 @@ export class TicTacToe {
         //this.router.navigateToRoute("tic-tac-toe");
         //this.router.navigateToRoute("projects/tic-tac-toe");
         // Reactivate page and update the squares with selected options
-        this.activate().then((response) => {
+        this.loadGameSettings().then((response) => {
             //this.updateSquareDisplay();
-            //debugger;
             if (response) {
                 // Enable all the squares
                 let squares = $("." + this.squareClass);
                 squares.prop({ disabled: false });
+                squares.removeClass(this.stateClasses);
+                squares.removeClass(this.playedClasses);
                 this.attached();
             }
         }).catch(function () {
             // without catching rejection (They clicked "Close"), an error will get thrown
             // So, just swallow it....
         });
+    }
+    private get playedClasses() {
+        return `${this.playedClass} ${this.xPlayedClass} ${this.oPlayedClass}`;
     }
     private get stateClasses() {
         return this.winClass + " " + this.loseClass + " " + this.tieClass;
@@ -212,7 +228,6 @@ export class TicTacToe {
         this.playPiece(bestMove.row, bestMove.column);
 
         // Re-enable buttons if playing human
-        debugger;
         let state = this.board.getState();
         if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && state === this.board.state.unfinished) {
             this.getUnplayedSquares().prop({ disabled: false });

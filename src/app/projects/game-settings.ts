@@ -1,6 +1,6 @@
 ﻿import { DialogController } from "aurelia-dialog";
 import { autoinject, inject } from "aurelia-framework";
-import { KeyValue } from "../../resources/KeyValue";
+import { KeyValue } from "../resources/KeyValue";
 
 export enum PlayOption {
     HumanVsHuman = 0,
