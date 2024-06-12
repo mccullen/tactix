@@ -20,6 +20,7 @@ export class GameSettings {
     public nColumns: number = this.maxColumns;
     public showState: boolean = true;
     public showDepth: boolean = true;
+    public showBoardStats: boolean = true;
     humanFirst: boolean = undefined;
     public playOptions: KeyValue<PlayOption, string>[] = [
         { key: PlayOption.HumanVsHuman, value: "Human versus Human" },
@@ -39,6 +40,7 @@ export class GameSettings {
             nColumns: this.nColumns,
             showState: this.showState,
             showDepth: this.showDepth,
+            showBoardStats: this.showBoardStats,
             selectedPlayOption: this.selectedPlayOption,
             humanFirst: this.humanFirst
         };

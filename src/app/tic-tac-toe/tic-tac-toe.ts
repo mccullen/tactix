@@ -24,6 +24,8 @@ export class TicTacToe {
     public showState: boolean = this.defaultGameSettings.showState;
     @bindable
     public showDepth: boolean = this.defaultGameSettings.showDepth;
+    @bindable
+    public showBoardStats: boolean = this.defaultGameSettings.showBoardStats;
     //public gameSettings: any;
     public selectedPlayOption: KeyValue<PlayOption, string> = this.defaultGameSettings.selectedPlayOption;
     humanFirst: boolean = this.defaultGameSettings.humanFirst;
@@ -80,7 +82,6 @@ export class TicTacToe {
     public async loadGameSettings() {
         // Get settings from the user
         let promise = new Promise<boolean>((resolve, reject) => {
-            //this.dialogService.open({ viewModel: GameSettings })
             this.dialogService.open({ viewModel: PLATFORM.moduleName('app/tic-tac-toe/game-settings') })
                 .whenClosed(async response => {
                     if (!response.wasCancelled) {
@@ -88,6 +89,7 @@ export class TicTacToe {
                         this.nColumns = response.output.nColumns;
                         this.showState = response.output.showState;
                         this.showDepth = response.output.showDepth;
+                        this.showBoardStats = response.output.showBoardStats;
                         this.selectedPlayOption = response.output.selectedPlayOption;
                         this.humanFirst = response.output.humanFirst;
                         await this.setNonGameSettingsProps();

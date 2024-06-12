@@ -1,92 +1,100 @@
 ﻿<template>
     <require from="./tic-tac-toe.css"></require>
     <h1>Tic-Tac-Toe!</h1>
-    ${currentPlayer}'s turn
     <div class="board-container">
-    <div>
-    <table id="tic-tac-toe">
-        <tr repeat.for="row of pieces">
-            <td repeat.for="piece of row">
-                <button class="btn square" id="sq-${$parent.$index}-${$index}" 
-                        click.delegate="onSquareClick($parent.$index, $index)">
-                </button>
-            </td>
-        </tr>
-    </table>
-        <button class="btn btn-success" click.delegate="onDownload()">Download Board</button>
-        <div class="checkbox"><label><input type="checkbox" checked.bind="showState" > Show state?</label></div>
-        <div class="checkbox"><label><input type="checkbox" checked.bind="showDepth" > Show depth?</label></div>
-        <button class="btn btn-danger" click.delegate="onReset()">Reset</button>
-    </div>
+        <!-- Tic tac toe board and buttons -->
+        <div class="tic-tac-toe-container tile">
+            ${currentPlayer}'s turn
+            <table id="tic-tac-toe">
+                <tr repeat.for="row of pieces">
+                    <td repeat.for="piece of row">
+                        <button class="btn square" id="sq-${$parent.$index}-${$index}" 
+                                click.delegate="onSquareClick($parent.$index, $index)">
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <div id="controls">
+                <button class="btn btn-success" click.delegate="onDownload()">Download Board</button>
+                <div class="checkbox"><label><input type="checkbox" checked.bind="showState" > Show state?</label></div>
+                <div class="checkbox"><label><input type="checkbox" checked.bind="showDepth" > Show depth?</label></div>
+                <div class="checkbox"><label><input type="checkbox" checked.bind="showBoardStats" > Show board stats?</label></div>
+                <button class="btn btn-danger" click.delegate="onReset()">Reset</button>
+            </div>
+        </div>
 
     
-    <div class="stats" if.bind="boardStats">
-        <h2>Board Stats</h2>
-        <ul>
-            <li>
-                <span data-toggle="tooltip" title="Total number of moves recorded across all board states">Total Moves:</span>
-                ${boardStats.totalMoves}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Total number of times X wins across all board states">Total Wins by X:</span>
-                ${boardStats.totalWinsX}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Total number of times O wins across all board states">Total Wins by O:</span>
-                ${boardStats.totalWinsO}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Total number of draws across all board states">Total Draws:</span>
-                ${boardStats.totalDraws}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Cumulative depth for wins by X">Total Depth for Wins by X:</span>
-                ${boardStats.totalDepthForWinsX}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Cumulative depth for wins by O">Total Depth for Wins by O:</span>
-                ${boardStats.totalDepthForWinsO}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Cumulative depth for draws">Total Depth for Draws:</span>
-                ${boardStats.totalDepthForDraws}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Smallest number of moves required for X to win">Shortest Win Depth for X:</span>
-                ${boardStats.shortestWinDepthX}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Smallest number of moves required for O to win">Shortest Win Depth for O:</span>
-                ${boardStats.shortestWinDepthO}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Longest game that results in a draw">Longest Draw Depth:</span>
-                ${boardStats.longestDrawDepth}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Total number of unique board states encountered">Unique Board States:</span>
-                ${boardStats.uniqueBoardStates}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Win rate for X when making the first move">First Move Win Rate for X:</span>
-                ${boardStats.firstMoveWinRateX}%
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Win rate for O when making the first move">First Move Win Rate for O:</span>
-                ${boardStats.firstMoveWinRateO}%
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Total number of first moves made by X">First Move Total for X:</span>
-                ${boardStats.firstMoveTotalX}
-            </li>
-            <li>
-                <span data-toggle="tooltip" title="Total number of first moves made by O">First Move Total for O:</span>
-                ${boardStats.firstMoveTotalO}
-            </li>
-        </ul>
-    </div>
-</div>
+        <!-- stats -->
+        <div id="stats-container" class="tile" if.bind="showBoardStats">
+            <h2>Board Stats</h2>
+            <ul>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of moves recorded across all board states">Total Moves:</span>
+                    ${boardStats.totalMoves}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of times X wins across all board states">Total Wins by X:</span>
+                    ${boardStats.totalWinsX}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of times O wins across all board states">Total Wins by O:</span>
+                    ${boardStats.totalWinsO}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of draws across all board states">Total Draws:</span>
+                    ${boardStats.totalDraws}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Cumulative depth for wins by X">Total Depth for Wins by X:</span>
+                    ${boardStats.totalDepthForWinsX}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Cumulative depth for wins by O">Total Depth for Wins by O:</span>
+                    ${boardStats.totalDepthForWinsO}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Cumulative depth for draws">Total Depth for Draws:</span>
+                    ${boardStats.totalDepthForDraws}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Smallest number of moves required for X to win">Shortest Win Depth for X:</span>
+                    ${boardStats.shortestWinDepthX}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Smallest number of moves required for O to win">Shortest Win Depth for O:</span>
+                    ${boardStats.shortestWinDepthO}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Longest game that results in a draw">Longest Draw Depth:</span>
+                    ${boardStats.longestDrawDepth}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of unique board states encountered">Unique Board States:</span>
+                    ${boardStats.uniqueBoardStates}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Win rate for X when making the first move">First Move Win Rate for X:</span>
+                    ${boardStats.firstMoveWinRateX}%
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Win rate for O when making the first move">First Move Win Rate for O:</span>
+                    ${boardStats.firstMoveWinRateO}%
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of first moves made by X">First Move Total for X:</span>
+                    ${boardStats.firstMoveTotalX}
+                </li>
+                <li>
+                    <span data-toggle="tooltip" title="Total number of first moves made by O">First Move Total for O:</span>
+                    ${boardStats.firstMoveTotalO}
+                </li>
+            </ul>
+        </div>
+        <!-- /Stats -->
 
     </div>
+    <!--/Board Container -->
+
+</div>
 
 </template>

@@ -27,10 +27,29 @@
 }
 
 .board-container {
-    display: flex; /* Use flexbox to align items */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.stats {
-    margin-right: auto;
-    margin-left: 20px; /* Add margin to separate the table and statistics */
+.tile {
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.tile h2 {
+    margin-bottom: 5px;
+    margin-top: 0;
+    font-size: 25px;
+}
+
+.tile ul {
+    padding-left: 20px;
+}
+
+#controls {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 3px solid lightgray;
 }
