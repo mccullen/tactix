@@ -13,7 +13,8 @@ import * as $ from "jquery";
 @autoinject()
 export class TicTacToe {
     private board: any;
-    private computerPlayer: any;
+    computerPlayer: any;
+    boardStats: any;
 
 
     defaultGameSettings = new GameSettings(null);
@@ -32,11 +33,9 @@ export class TicTacToe {
     // Would it be better to inject a board object instead of the factory?
     constructor(
             public dialogService: DialogService,
-            public router: Router/*,
-            public computerPlayerService: ComputerPlayerService*/) {
+            public router: Router) {
         this.dialogService = dialogService;
         this.router = router;
-        this.setNonGameSettingsProps();
     }
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -45,7 +44,7 @@ export class TicTacToe {
     }
 
     async attached() {
-        //let result = await this.loadGameSettings();
+        await this.setNonGameSettingsProps();
         this.updateSquareDisplay();
         if (this.selectedPlayOption.key === PlayOption.HumanVsComputer && !this.humanFirst) {
             await this.makeComputerPlayerMove();
@@ -63,10 +62,16 @@ export class TicTacToe {
     getGameSettings() {
     }
 
-    public setNonGameSettingsProps() {
+    public async setNonGameSettingsProps() {
         this.board = boardFactory({ numRows: this.nRows, numColumns: this.nColumns });
         this.currentPlayer = this.board.getCurrentPlayer();
         this.computerPlayer = computerPlayerFactory();
+        // If solution is already on server, no need to minimax...
+        let solutionFilename = `solution-${this.nRows}-by-${this.nColumns}.json`;
+        //let json = await $.get(solutionFilename);
+        //this.computerPlayer.setBoardToMoves(json);
+        //this.nValidBoardStates = this.computerPlayer.getBoardToMoves().length;
+        //debugger;
         this.pieces = this.board.getPieces();
     }
     public async loadGameSettings() {
@@ -74,7 +79,7 @@ export class TicTacToe {
         let promise = new Promise<boolean>((resolve, reject) => {
             //this.dialogService.open({ viewModel: GameSettings })
             this.dialogService.open({ viewModel: PLATFORM.moduleName('app/tic-tac-toe/game-settings') })
-                .whenClosed(response => {
+                .whenClosed(async response => {
                     if (!response.wasCancelled) {
                         this.nRows = response.output.nRows;
                         this.nColumns = response.output.nColumns;
@@ -82,7 +87,7 @@ export class TicTacToe {
                         this.showDepth = response.output.showDepth;
                         this.selectedPlayOption = response.output.selectedPlayOption;
                         this.humanFirst = response.output.humanFirst;
-                        this.setNonGameSettingsProps();
+                        await this.setNonGameSettingsProps();
                         resolve(true);
                     } else {
                         reject(false);
@@ -128,20 +133,39 @@ export class TicTacToe {
             if (state === this.board.state.xWon) {
                 alert("x won");
             } else if (state === this.board.state.oWon) {
-                //setTimeout(() => { alert("o won"); }, 1);
                 alert("o won");
             } else if (state === this.board.state.draw) {
-                //setTimeout(() => { alert("tie"); }, 1);
                 alert("tie");
             }
         }
-
-
         return displ;
     }
+    downloadJson(json, filename, indent=2) {
+        const blob = new Blob([JSON.stringify(json, null, indent)], { type: "application/json" });
+        const link = document.createElement("a");
+
+        link.download = filename;
+        link.href = window.URL.createObjectURL(blob);
+        link.dataset.downloadurl = ["application/json", link.download, link.href].join(":");
+        console.log(link.dataset.downloadurl);
+
+        const evt = new MouseEvent("click", {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+        });
+
+        link.dispatchEvent(evt);
+        link.remove()
+    }
+
+    getSolutionFilename() {
+        return `solution-${this.nRows}-${this.nColumns}.json`;
+    }
+    onDownload() {
+        this.downloadJson(this.computerPlayer.getBoardToMoves(), this.getSolutionFilename());
+    }
     onReset() {
-        //this.router.navigateToRoute("tic-tac-toe");
-        //this.router.navigateToRoute("projects/tic-tac-toe");
         // Reactivate page and update the squares with selected options
         this.loadGameSettings().then((response) => {
             //this.updateSquareDisplay();
@@ -182,6 +206,7 @@ export class TicTacToe {
 //////////////
 //let promise = new Promise((resolve, reject) => {
             let moveValues = this.computerPlayer.getMoveValues(this.board);
+            this.boardStats = this.computerPlayer.getStats();
 //////
 
 

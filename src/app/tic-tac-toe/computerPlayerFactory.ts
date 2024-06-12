@@ -163,6 +163,98 @@ var computerPlayerFactory: any = function (spec) {
         return result;
     };
 
+    computerPlayer.getStats = function () {
+        const boardStats: any = {
+            totalMoves: 0,
+            totalWinsX: 0,
+            totalWinsO: 0,
+            totalDraws: 0,
+            totalDepthForWinsX: 0,
+            totalDepthForWinsO: 0,
+            totalDepthForDraws: 0,
+            shortestWinDepthX: Infinity,
+            shortestWinDepthO: Infinity,
+            longestDrawDepth: 0,
+            uniqueBoardStates: 0,
+            moveCounts: {},
+            firstMoveWinRateX: 0,
+            firstMoveWinRateO: 0,
+            firstMoveTotalX: 0,
+            firstMoveTotalO: 0,
+            moveFrequencies: {}
+          };
+          
+          for (const board in mBoardToMoves) {
+            const moves = mBoardToMoves[board];
+            boardStats.totalMoves += moves.length;
+            boardStats.uniqueBoardStates += 1; // Count unique board states
+          
+            moves.forEach((move, index) => {
+              if (move.state === 1) { // X wins
+                boardStats.totalWinsX += 1;
+                boardStats.totalDepthForWinsX += move.depth;
+                if (move.depth < boardStats.shortestWinDepthX) {
+                  boardStats.shortestWinDepthX = move.depth;
+                }
+                if (index === 0) {
+                  boardStats.firstMoveWinRateX += 1;
+                }
+              } else if (move.state === -1) { // O wins
+                boardStats.totalWinsO += 1;
+                boardStats.totalDepthForWinsO += move.depth;
+                if (move.depth < boardStats.shortestWinDepthO) {
+                  boardStats.shortestWinDepthO = move.depth;
+                }
+                if (index === 1) {
+                  boardStats.firstMoveWinRateO += 1;
+                }
+              } else if (move.state === 0) { // Draw
+                boardStats.totalDraws += 1;
+                boardStats.totalDepthForDraws += move.depth;
+                if (move.depth > boardStats.longestDrawDepth) {
+                  boardStats.longestDrawDepth = move.depth;
+                }
+              }
+          
+              // Track move counts by depth
+              if (!boardStats.moveCounts[move.depth]) {
+                boardStats.moveCounts[move.depth] = 0;
+              }
+              boardStats.moveCounts[move.depth] += 1;
+          
+              // Track move frequencies
+              const moveKey = `${move.row}-${move.column}`;
+              if (!boardStats.moveFrequencies[moveKey]) {
+                boardStats.moveFrequencies[moveKey] = 0;
+              }
+              boardStats.moveFrequencies[moveKey] += 1;
+            });
+          }
+          
+          // Calculate averages
+          boardStats.averageDepthForWinsX = boardStats.totalWinsX > 0 ? boardStats.totalDepthForWinsX / boardStats.totalWinsX : 0;
+          boardStats.averageDepthForWinsO = boardStats.totalWinsO > 0 ? boardStats.totalDepthForWinsO / boardStats.totalWinsO : 0;
+          boardStats.averageDepthForDraws = boardStats.totalDraws > 0 ? boardStats.totalDepthForDraws / boardStats.totalDraws : 0;
+          
+          // Calculate win rates
+          boardStats.winRateX = (boardStats.totalWinsX / boardStats.totalMoves) * 100;
+          boardStats.winRateO = (boardStats.totalWinsO / boardStats.totalMoves) * 100;
+          boardStats.drawRate = (boardStats.totalDraws / boardStats.totalMoves) * 100;
+          
+          // Calculate first move win rates
+          boardStats.firstMoveWinRateX = (boardStats.firstMoveWinRateX / boardStats.uniqueBoardStates) * 100;
+          boardStats.firstMoveWinRateO = (boardStats.firstMoveWinRateO / boardStats.uniqueBoardStates) * 100;
+          
+          // Determine most frequent winning moves
+          const mostFrequentWinningMoveX = Object.entries(boardStats.moveFrequencies).reduce((a: any, b: any) => boardStats.moveFrequencies[a] > boardStats.moveFrequencies[b] ? a : b, null);
+          const mostFrequentWinningMoveO = Object.entries(boardStats.moveFrequencies).reduce((a: any, b: any) => boardStats.moveFrequencies[a] > boardStats.moveFrequencies[b] ? a : b, null);
+          
+          console.log('Board Statistics:', boardStats);
+          console.log('Most Frequent Winning Move for X:', mostFrequentWinningMoveX);
+          console.log('Most Frequent Winning Move for O:', mostFrequentWinningMoveO);
+        return boardStats;
+    };
+
     computerPlayer.getBoardToMoves = function () {
         return mBoardToMoves;
     };

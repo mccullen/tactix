@@ -25,3 +25,12 @@
 .square {
     font-size: xx-large;
 }
+
+.board-container {
+    display: flex; /* Use flexbox to align items */
+}
+
+.stats {
+    margin-right: auto;
+    margin-left: 20px; /* Add margin to separate the table and statistics */
+}
