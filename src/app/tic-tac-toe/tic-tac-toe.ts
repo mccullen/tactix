@@ -68,10 +68,13 @@ export class TicTacToe {
         this.computerPlayer = computerPlayerFactory();
         // If solution is already on server, no need to minimax...
         let solutionFilename = `solution-${this.nRows}-by-${this.nColumns}.json`;
-        //let json = await $.get(solutionFilename);
-        //this.computerPlayer.setBoardToMoves(json);
-        //this.nValidBoardStates = this.computerPlayer.getBoardToMoves().length;
-        //debugger;
+        try {
+            // Try to get the solution file on server, if it exists. Othewise, just swoallow the error
+            let json = await $.get(solutionFilename);
+            //this.computerPlayer.setBoardToMoves(json);
+            this.computerPlayer.setBoardToMoves(json.boardToMoves);
+        } catch (error) {
+        }
         this.pieces = this.board.getPieces();
     }
     public async loadGameSettings() {
@@ -160,10 +163,14 @@ export class TicTacToe {
     }
 
     getSolutionFilename() {
-        return `solution-${this.nRows}-${this.nColumns}.json`;
+        return `solution-${this.nRows}-by-${this.nColumns}.json`;
     }
     onDownload() {
-        this.downloadJson(this.computerPlayer.getBoardToMoves(), this.getSolutionFilename());
+        let json = {
+            boardStats: this.computerPlayer.getStats(),
+            boardToMoves: this.computerPlayer.getBoardToMoves()
+        }
+        this.downloadJson(json, this.getSolutionFilename());
     }
     onReset() {
         // Reactivate page and update the squares with selected options
