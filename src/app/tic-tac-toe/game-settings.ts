@@ -33,6 +33,13 @@ export class GameSettings {
         this.controller = controller;
     }
     public activate(model) {
+        this.nRows = model.nRows;
+        this.nColumns = model.nColumns;
+        this.showState = model.showState;
+        this.showDepth = model.showDepth;
+        this.showBoardStats = model.showBoardStats;
+        this.selectedPlayOption = model.selectedPlayOption;
+        this.humanFirst = model.humanFirst;
     }
     public getSettings() {
         return {

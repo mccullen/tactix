@@ -82,7 +82,18 @@ export class TicTacToe {
     public async loadGameSettings() {
         // Get settings from the user
         let promise = new Promise<boolean>((resolve, reject) => {
-            this.dialogService.open({ viewModel: PLATFORM.moduleName('app/tic-tac-toe/game-settings') })
+            this.dialogService.open({
+                viewModel: PLATFORM.moduleName('app/tic-tac-toe/game-settings'), 
+                model: {
+                    nRows: this.nRows,
+                    nColumns: this.nColumns,
+                    showState: this.showState,
+                    showDepth: this.showDepth,
+                    showBoardStats: this.showBoardStats,
+                    selectedPlayOption: this.selectedPlayOption,
+                    humanFirst: this.humanFirst
+                } 
+            })
                 .whenClosed(async response => {
                     if (!response.wasCancelled) {
                         this.nRows = response.output.nRows;
